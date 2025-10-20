@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* Updated color scheme to match the uploaded dashboard design */
+    --background: 240 20% 98%;
+    --foreground: 220 13% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+    --primary: 195 100% 39%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 195 32% 94%;
+    --secondary-foreground: 220 13% 18%;
+    --muted: 195 16% 96%;
+    --muted-foreground: 220 13% 45%;
+    --accent: 195 32% 94%;
+    --accent-foreground: 220 13% 18%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 195 100% 39%;
+    --chart-1: 195 100% 39%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.75rem;
+    /* Updated sidebar colors for better light mode visibility and mobile opacity */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 13% 18%;
+    --sidebar-primary: 195 100% 39%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 195 16% 96%;
+    --sidebar-accent-foreground: 220 13% 18%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 195 100% 39%;
+  }
+  .dark {
+    /* Updated dark theme to maintain consistency */
+    --background: 220 13% 9%;
+    --foreground: 0 0% 98%;
+    --card: 220 13% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 13% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 195 100% 39%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 220 13% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --ring: 195 100% 39%;
+    --chart-1: 195 100% 39%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    /* Fixed dark mode sidebar colors for better visibility and reduced transparency on mobile */
+    --sidebar-background: 220 13% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 195 100% 39%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 220 13% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-ring: 195 100% 39%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added custom scrollbar styles for better UX */
+@layer components {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Added gradient backgrounds for stat cards */
+  .stat-card-gradient-1 {
+    background: linear-gradient(135deg, hsl(195 100% 39%) 0%, hsl(195 100% 49%) 100%);
+  }
+
+  .stat-card-gradient-2 {
+    background: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(160 84% 49%) 100%);
+  }
+
+  .stat-card-gradient-3 {
+    background: linear-gradient(135deg, hsl(30 80% 55%) 0%, hsl(30 80% 65%) 100%);
+  }
+
+  .stat-card-gradient-4 {
+    background: linear-gradient(135deg, hsl(280 65% 60%) 0%, hsl(280 65% 70%) 100%);
+  }
+}
+
+/* Added mobile-specific sidebar styles for better visibility */
+@media (max-width: 1024px) {
+  .sidebar-mobile {
+    background: hsl(var(--sidebar-background)) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid hsl(var(--sidebar-border));
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .sidebar-mobile {
+    background: hsl(var(--sidebar-background) / 0.95) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+}
