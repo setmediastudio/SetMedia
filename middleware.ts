@@ -11,6 +11,10 @@ export default withAuth(
     const isOldDashboard = req.nextUrl.pathname === "/dashboard"
     const isAPIRoute = req.nextUrl.pathname.startsWith("/api")
 
+    if (isAdminRoute && token && token.role !== "admin") {
+      console.warn(`[SECURITY] Unauthorized admin access attempt from user: ${token.userId}`)
+    }
+
     // Allow access to admin login page
     if (isAdminLoginRoute) {
       const response = NextResponse.next()

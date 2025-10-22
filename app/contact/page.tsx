@@ -14,6 +14,17 @@ import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useSession } from "next-auth/react"
 
+// TikTok icon component since it's not available in lucide-react
+const Tiktok = ({ className }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+  </svg>
+)
+
 export default function ContactPage() {
   const { data: session } = useSession()
   const { toast } = useToast()
@@ -181,9 +192,9 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-semibold mb-1">Address</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        123 Cinematic Avenue
+                        27 Adeyi Avenue
                         <br />
-                        Lagos, Nigeria
+                        Bodija, Ibadan, Nigeria
                       </p>
                     </div>
                   </div>
@@ -192,7 +203,7 @@ export default function ContactPage() {
                     <Phone className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold mb-1">Phone</h3>
-                      <p className="text-sm text-muted-foreground">+234 800 123 4567</p>
+                      <p className="text-sm text-muted-foreground">+234 808 942 1037</p>
                     </div>
                   </div>
 
@@ -200,7 +211,7 @@ export default function ContactPage() {
                     <Mail className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-sm text-muted-foreground">info@setmedia.com</p>
+                      <p className="text-sm text-muted-foreground">info@setmediastudio.com</p>
                     </div>
                   </div>
 
@@ -209,11 +220,11 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-semibold mb-1">Business Hours</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        Mon - Fri: 9:00 AM - 6:00 PM
+                        Mon - Fri: 9:00 AM - 4:00 PM
                         <br />
-                        Sat: 10:00 AM - 4:00 PM
+                        Sat: By Appointment
                         <br />
-                        Sun: By Appointment
+                        Sun: Closed
                       </p>
                     </div>
                   </div>
@@ -232,7 +243,7 @@ export default function ContactPage() {
                       className="rounded-full hover:bg-primary hover:text-primary-foreground transition-all bg-transparent"
                       asChild
                     >
-                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                      <a href="https://www.instagram.com/_setmedia?igsh=MTd6dTV5bGg1OHJqdw==" target="_blank" rel="noopener noreferrer">
                         <Instagram className="h-5 w-5" />
                       </a>
                     </Button>
@@ -242,7 +253,7 @@ export default function ContactPage() {
                       className="rounded-full hover:bg-primary hover:text-primary-foreground transition-all bg-transparent"
                       asChild
                     >
-                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                      <a href="https://www.facebook.com/profile.php?id=61573209824619" target="_blank" rel="noopener noreferrer">
                         <Facebook className="h-5 w-5" />
                       </a>
                     </Button>
@@ -254,6 +265,16 @@ export default function ContactPage() {
                     >
                       <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
                         <Youtube className="h-5 w-5" />
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full hover:bg-primary hover:text-primary-foreground transition-all bg-transparent"
+                      asChild
+                    >
+                      <a href="https://vt.tiktok.com/ZSUHGYhvv/" target="_blank" rel="noopener noreferrer">
+                        <Tiktok className="h-5 w-5" />
                       </a>
                     </Button>
                   </div>

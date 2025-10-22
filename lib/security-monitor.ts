@@ -49,7 +49,6 @@ export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
       resolved: false,
     })
 
-    // Log critical events to activity log as well
     if (event.severity === "critical" && userObjectId) {
       await ActivityLog.create({
         userId: userObjectId,
@@ -64,6 +63,9 @@ export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
         ipAddress: event.ipAddress,
         userAgent: event.userAgent,
       })
+
+      // Log to console for immediate visibility
+      console.error(`[CRITICAL SECURITY EVENT] ${event.event} - User: ${event.userId} - IP: ${event.ipAddress}`)
     }
   } catch (error) {
     console.error("Failed to log security event:", error)
@@ -236,5 +238,86 @@ export async function getSecurityMetrics(timeRange: "hour" | "day" | "week" | "m
   } catch (error) {
     console.error("Failed to get security metrics:", error)
     return null
+  }
+}
+
+export async function analyzeSecurityTrends(days = 7) {
+  try {
+    await dbConnect()
+
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - days)
+
+    const trends = await SecurityLog.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            event: "$event",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.date": 1 } },
+    ])
+
+    return trends
+  } catch (error) {
+    console.error("Failed to analyze security trends:", error)
+    return []
+  }
+}
+
+export async function getBlockedIPs(): Promise<string[]> {
+  try {
+    await dbConnect()
+
+    const blockedIPs = await SecurityLog.aggregate([
+      {
+        $match: {
+          event: "rate_limit_exceeded",
+          createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        },
+      },
+      { $group: { _id: "$ipAddress", count: { $sum: 1 } } },
+      { $match: { count: { $gte: 10 } } },
+      { $project: { _id: 1 } },
+    ])
+
+    return blockedIPs.map((item) => item._id)
+  } catch (error) {
+    console.error("Failed to get blocked IPs:", error)
+    return []
+  }
+}
+
+export async function checkIPReputation(ipAddress: string): Promise<{ isBlocked: boolean; riskLevel: string }> {
+  try {
+    await dbConnect()
+
+    const recentEvents = await SecurityLog.countDocuments({
+      ipAddress,
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      severity: { $in: ["high", "critical"] },
+    })
+
+    const failedAttempts = await SecurityLog.countDocuments({
+      ipAddress,
+      event: "login_failure",
+      createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) },
+    })
+
+    const isBlocked = recentEvents >= 5 || failedAttempts >= 10
+    let riskLevel = "low"
+
+    if (failedAttempts >= 10) riskLevel = "critical"
+    else if (recentEvents >= 5) riskLevel = "high"
+    else if (failedAttempts >= 5) riskLevel = "medium"
+
+    return { isBlocked, riskLevel }
+  } catch (error) {
+    console.error("Failed to check IP reputation:", error)
+    return { isBlocked: false, riskLevel: "unknown" }
   }
 }

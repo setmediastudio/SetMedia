@@ -20,7 +20,7 @@ export const nameSchema = z
 
 export const phoneSchema = z
   .string()
-  .regex(/^\+?[\d\s\-$$$$]+$/, "Invalid phone number format")
+  .regex(/^\+?[\d\s\-()]+$/, "Invalid phone number format")
   .min(10, "Phone number too short")
   .max(20, "Phone number too long")
 
@@ -78,6 +78,19 @@ export const contactSchema = z.object({
   turnstileToken: z.string().min(1, "Security verification required"),
 })
 
+export const urlSchema = z
+  .string()
+  .url("Invalid URL")
+  .refine((url) => {
+    try {
+      const parsed = new URL(url)
+      // Only allow http and https protocols
+      return ["http:", "https:"].includes(parsed.protocol)
+    } catch {
+      return false
+    }
+  }, "Invalid URL protocol")
+
 // Sanitization functions
 export function sanitizeString(input: string): string {
   return input
@@ -85,6 +98,7 @@ export function sanitizeString(input: string): string {
     .replace(/[<>]/g, "") // Remove potential HTML tags
     .replace(/javascript:/gi, "") // Remove javascript: protocol
     .replace(/on\w+=/gi, "") // Remove event handlers
+    .replace(/data:/gi, "") // Remove data: protocol
 }
 
 export function sanitizeEmail(email: string): string {
@@ -96,6 +110,18 @@ export function sanitizeFileName(fileName: string): string {
     .replace(/[^a-zA-Z0-9.-]/g, "_") // Replace special chars with underscore
     .replace(/_{2,}/g, "_") // Replace multiple underscores with single
     .substring(0, 255) // Limit length
+}
+
+// Added XSS prevention through HTML escaping
+export function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char])
 }
 
 // Input validation middleware

@@ -19,6 +19,7 @@ export default function HomePage() {
   const [scrollY, setScrollY] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [videoError, setVideoError] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,7 +39,17 @@ export default function HomePage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            // Attempt to play the video
             video.load()
+            const playPromise = video.play()
+
+            if (playPromise !== undefined) {
+              playPromise.catch((error) => {
+                console.warn("Video autoplay failed:", error)
+                // Video will still show poster image if autoplay fails
+              })
+            }
+
             observer.disconnect()
           }
         })
@@ -61,6 +72,13 @@ export default function HomePage() {
 
   const handleVideoLoad = () => {
     setVideoLoaded(true)
+    setVideoError(false)
+  }
+
+  const handleVideoError = () => {
+    console.error("Video failed to load")
+    setVideoError(true)
+    setVideoLoaded(true) // Show poster image as fallback
   }
 
   return (
@@ -80,9 +98,10 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             poster="/cinematic-photography-studio-behind-the-scenes.jpg"
             onLoadedData={handleVideoLoad}
+            onError={handleVideoError}
             style={{
               transform: `translateY(${scrollY * 0.5}px) scale(${1 + scrollY * 0.0002})`,
             }}

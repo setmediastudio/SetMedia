@@ -34,7 +34,6 @@ export async function validateAPIRequest(
     const clientId = getClientIdentifier(request)
     let rateLimitHeaders: Record<string, string> = {}
 
-    // Apply rate limiting
     if (rateLimit !== "none") {
       let limiter
       switch (rateLimit) {
@@ -79,7 +78,6 @@ export async function validateAPIRequest(
         return { success: false, error: "Admin access required", rateLimitHeaders }
       }
 
-      // Validate CSRF token for state-changing operations
       if (requireCSRF && ["POST", "PUT", "DELETE", "PATCH"].includes(request.method)) {
         const csrfToken = getCSRFTokenFromHeaders(request.headers)
         if (!csrfToken || !verifyCSRFToken(csrfToken)) {
@@ -89,16 +87,21 @@ export async function validateAPIRequest(
 
       // Validate Turnstile token if required
       if (requireTurnstile) {
-        const body = await request.json()
-        const turnstileToken = body.turnstileToken
+        try {
+          const body = await request.json()
+          const turnstileToken = body.turnstileToken
 
-        if (!turnstileToken) {
-          return { success: false, error: "Turnstile verification required", rateLimitHeaders }
-        }
+          if (!turnstileToken) {
+            return { success: false, error: "Turnstile verification required", rateLimitHeaders }
+          }
 
-        const turnstileResult = await verifyTurnstileToken(turnstileToken)
-        if (!turnstileResult.success) {
-          return { success: false, error: "Turnstile verification failed", rateLimitHeaders }
+          const turnstileResult = await verifyTurnstileToken(turnstileToken)
+          if (!turnstileResult.success) {
+            return { success: false, error: "Turnstile verification failed", rateLimitHeaders }
+          }
+        } catch (error) {
+          console.error("Turnstile validation error:", error)
+          return { success: false, error: "Security verification failed", rateLimitHeaders }
         }
       }
 
