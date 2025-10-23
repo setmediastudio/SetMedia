@@ -89,7 +89,7 @@ export function Turnstile({
     }
 
     const script = document.createElement("script")
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad"
     script.async = true
     script.defer = true
     script.onload = () => {
@@ -126,7 +126,6 @@ export function Turnstile({
         containerRef.current.innerHTML = ""
       }
 
-      // Render widget
       const widgetId = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         theme,
@@ -134,6 +133,8 @@ export function Turnstile({
         callback: handleVerify,
         "error-callback": handleError,
         "expired-callback": handleExpire,
+        retry: "auto",
+        "retry-interval": 8000,
       })
 
       widgetIdRef.current = widgetId

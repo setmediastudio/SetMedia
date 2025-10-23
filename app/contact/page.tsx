@@ -211,7 +211,7 @@ export default function ContactPage() {
                     <Mail className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-sm text-muted-foreground">info@setmediastudio.com</p>
+                      <p className="text-sm text-muted-foreground">setmediastudio@gmail.com</p>
                     </div>
                   </div>
 

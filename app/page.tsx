@@ -27,7 +27,7 @@ export default function HomePage() {
       setScrollY(window.scrollY)
     }
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -39,13 +39,15 @@ export default function HomePage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            // Preload video data first
+            video.preload = "auto"
+
             // Attempt to play the video
-            video.load()
             const playPromise = video.play()
 
             if (playPromise !== undefined) {
               playPromise.catch((error) => {
-                console.warn("Video autoplay failed:", error)
+                console.warn("[v0] Video autoplay failed:", error)
                 // Video will still show poster image if autoplay fails
               })
             }
@@ -76,7 +78,7 @@ export default function HomePage() {
   }
 
   const handleVideoError = () => {
-    console.error("Video failed to load")
+    console.error("[v0] Video failed to load")
     setVideoError(true)
     setVideoLoaded(true) // Show poster image as fallback
   }
@@ -98,7 +100,7 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             poster="/cinematic-photography-studio-behind-the-scenes.jpg"
             onLoadedData={handleVideoLoad}
             onError={handleVideoError}

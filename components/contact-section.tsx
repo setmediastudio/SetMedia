@@ -99,7 +99,7 @@ export function ContactSection() {
               <Mail className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
               <div>
                 <h3 className="mb-2 text-lg font-semibold">Email</h3>
-                <p className="text-muted-foreground">info@setmediastudio.com</p>
+                <p className="text-muted-foreground">setmediastudio@gmail.com</p>
               </div>
             </div>
 

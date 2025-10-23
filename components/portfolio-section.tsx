@@ -59,11 +59,11 @@ export function PortfolioSection() {
             if (entry.isIntersecting) {
               setTimeout(() => {
                 setVisibleItems((prev) => new Set(prev).add(index))
-              }, index * 100)
+              }, index * 50) // Reduced stagger delay
             }
           })
         },
-        { threshold: 0.2 },
+        { threshold: 0.1, rootMargin: "50px" }, // Added rootMargin for earlier loading
       )
 
       observer.observe(ref)
@@ -84,7 +84,7 @@ export function PortfolioSection() {
         setUploads(data.uploads)
       }
     } catch (error) {
-      console.error("Failed to fetch portfolio data:", error)
+      console.error("[v0] Failed to fetch portfolio data:", error)
     } finally {
       setIsLoading(false)
     }
@@ -179,7 +179,7 @@ export function PortfolioSection() {
                 ref={(el) => {
                   itemRefs.current[index] = el
                 }}
-                className="group relative mb-6 break-inside-avoid overflow-hidden rounded-lg cursor-pointer transition-all duration-700"
+                className="group relative mb-6 break-inside-avoid overflow-hidden rounded-lg cursor-pointer transition-all duration-700 will-change-transform"
                 style={{
                   opacity: visibleItems.has(index) ? 1 : 0,
                   transform: visibleItems.has(index)
@@ -195,7 +195,12 @@ export function PortfolioSection() {
                       muted
                       loop
                       playsInline
-                      onMouseEnter={(e) => e.currentTarget.play()}
+                      loading="lazy"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.play().catch(() => {
+                          // Autoplay may be blocked
+                        })
+                      }}
                       onMouseLeave={(e) => {
                         e.currentTarget.pause()
                         e.currentTarget.currentTime = 0
@@ -213,6 +218,8 @@ export function PortfolioSection() {
                     width={600}
                     height={600}
                     className="w-full transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    quality={75}
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">

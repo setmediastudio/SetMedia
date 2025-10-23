@@ -19,15 +19,21 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileResp
   formData.append("response", token)
 
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
     const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
       body: formData,
+      signal: controller.signal,
     })
+
+    clearTimeout(timeoutId)
 
     const result: TurnstileResponse = await response.json()
     return result
   } catch (error) {
-    console.error("Turnstile verification error:", error)
+    console.error("[v0] Turnstile verification error:", error)
     return { success: false, "error-codes": ["network-error"] }
   }
 }
@@ -35,7 +41,7 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileResp
 export function getTurnstileSiteKey(): string {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
   if (!siteKey) {
-    console.warn("Turnstile site key not configured")
+    console.warn("[v0] Turnstile site key not configured")
     return ""
   }
   return siteKey

@@ -60,7 +60,7 @@ export default function BlogPage() {
         setPosts(data.posts)
       }
     } catch (error) {
-      console.error("Failed to fetch blog data:", error)
+      console.error("[v0] Failed to fetch blog data:", error)
     } finally {
       setIsLoading(false)
     }
@@ -143,6 +143,8 @@ export default function BlogPage() {
                     alt={posts[0].title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    quality={80}
                   />
                 </div>
                 <div className="p-8 flex flex-col justify-center">
@@ -202,6 +204,8 @@ export default function BlogPage() {
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                      quality={75}
                     />
                   </div>
                   <CardHeader>
