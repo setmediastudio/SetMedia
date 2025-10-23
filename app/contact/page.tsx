@@ -203,7 +203,7 @@ export default function ContactPage() {
                     <Phone className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-semibold mb-1">Phone</h3>
-                      <p className="text-sm text-muted-foreground">+234 808 942 1037</p>
+                      <p className="text-sm text-muted-foreground">+234 808 942 0137</p>
                     </div>
                   </div>
 

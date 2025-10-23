@@ -91,7 +91,7 @@ export function ContactSection() {
               <Phone className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
               <div>
                 <h3 className="mb-2 text-lg font-semibold">Phone</h3>
-                <p className="text-muted-foreground">+234 808 942 1037</p>
+                <p className="text-muted-foreground">+234 808 942 0137</p>
               </div>
             </div>
 
