@@ -23,6 +23,7 @@ export default function HomePage() {
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [videoError, setVideoError] = useState(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
+  const [showLoader, setShowLoader] = useState(true)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,6 +61,8 @@ export default function HomePage() {
 
     const handleCanPlay = () => {
       setVideoLoaded(true)
+      // Hide loader after video is ready and animation completes
+      setTimeout(() => setShowLoader(false), 500)
       attemptVideoPlay()
     }
 
@@ -78,6 +81,8 @@ export default function HomePage() {
       setVideoError(true)
       setVideoLoaded(true)
       setIsVideoPlaying(false)
+      // Hide loader on error too
+      setShowLoader(false)
     }
 
     const handleStalled = () => {
@@ -99,6 +104,11 @@ export default function HomePage() {
       attemptVideoPlay()
     }, 500)
 
+    // Hide loader after 3 seconds max (failsafe)
+    const loaderTimeout = setTimeout(() => {
+      setShowLoader(false)
+    }, 3000)
+
     const handleUserInteraction = () => {
       if (!isVideoPlaying && video.paused) {
         attemptVideoPlay()
@@ -117,6 +127,7 @@ export default function HomePage() {
       document.removeEventListener("touchstart", handleUserInteraction)
       document.removeEventListener("click", handleUserInteraction)
       clearTimeout(playTimeout)
+      clearTimeout(loaderTimeout)
     }
   }, [attemptVideoPlay, isVideoPlaying])
 
@@ -141,6 +152,73 @@ export default function HomePage() {
         <MainNav />
 
         <section className="relative h-screen w-full overflow-hidden">
+          {/* Video Loading Animation */}
+          {showLoader && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-500">
+              <div className="relative">
+                {/* Main loader */}
+                <div className="loader"></div>
+                
+                {/* Loading text */}
+                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <p className="text-sm text-white/70 animate-pulse">Loading cinematic experience...</p>
+                </div>
+              </div>
+              
+              {/* CSS for loader */}
+              <style jsx>{`
+                .loader {
+                  width: 70px;
+                  aspect-ratio: 1;
+                  display: grid;
+                  border: 4px solid transparent;
+                  border-radius: 50%;
+                  border-color: rgba(212, 165, 94, 0.2) transparent;
+                  animation: l16 1s infinite linear;
+                  position: relative;
+                }
+                .loader::before,
+                .loader::after {    
+                  content: "";
+                  grid-area: 1/1;
+                  margin: 2px;
+                  border: inherit;
+                  border-radius: 50%;
+                  animation: inherit;
+                }
+                .loader::before {
+                  border-color: rgba(212, 165, 94, 0.8) transparent;
+                  animation-duration: .5s;
+                  animation-direction: reverse;
+                }
+                .loader::after {
+                  margin: 8px;
+                  border-color: rgba(212, 165, 94, 0.4) transparent;
+                  animation-duration: 2s;
+                }
+                @keyframes l16 { 
+                  100% { transform: rotate(1turn); }
+                }
+                
+                /* Optional: Add a subtle glow effect */
+                .loader::before {
+                  box-shadow: 0 0 20px rgba(212, 165, 94, 0.3);
+                }
+                
+                /* Smooth fade-out for the loader */
+                .fade-out {
+                  animation: fadeOut 0.5s ease-out forwards;
+                }
+                @keyframes fadeOut {
+                  to {
+                    opacity: 0;
+                    visibility: hidden;
+                  }
+                }
+              `}</style>
+            </div>
+          )}
+
           <video
             ref={videoRef}
             autoPlay

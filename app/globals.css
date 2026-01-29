@@ -210,46 +210,54 @@ body {
   }
 
   .will-change-transform {
-    will-change: transform;
+    /* Removed will-change for Safari compatibility - use transform3d instead */
+    transform: translate3d(0, 0, 0);
   }
 
   .transform {
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0);
   }
 
   /* Image loading optimization */
   img {
     content-visibility: auto;
     contain: layout style paint;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   /* Portfolio masonry optimization */
-  .columns-1 {
-    content-visibility: auto;
-  }
-
-  .columns-2 {
-    content-visibility: auto;
-  }
-
-  .columns-3 {
-    content-visibility: auto;
-  }
-
+  .columns-1,
+  .columns-2,
+  .columns-3,
   .columns-4 {
     content-visibility: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
-  /* Optimized group hover for portfolio items */
+  /* Safari and Chrome GPU acceleration for smooth animations */
   .group {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
   }
 
   .group img {
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateZ(0);
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    perspective: 1000px;
+  }
+
+  /* Portfolio item Safari optimization - prevent flickering */
+  .group[style*="opacity"] {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: auto;
   }
 
   @keyframes float {

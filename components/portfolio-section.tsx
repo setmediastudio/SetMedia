@@ -69,9 +69,11 @@ export function PortfolioSection() {
                 setVisibleItems((prev) => new Set(prev).add(index))
               }, Math.min(index * 30, 300))
             }
+            // Don't unload on Safari - this prevents flickering when scrolling back
+            // Once visible, items stay visible to avoid rerendering issues
           })
         },
-        { threshold: 0.05, rootMargin: "100px" },
+        { threshold: 0.01, rootMargin: "150px" },
       )
 
       observer.observe(ref)
@@ -346,12 +348,16 @@ export function PortfolioSection() {
                         ref={(el) => {
                           itemRefs.current[itemIndex] = el
                         }}
-                        className="group relative mb-6 break-inside-avoid overflow-hidden rounded-xl cursor-pointer transition-all duration-700 will-change-transform border border-transparent hover:border-primary/20"
+                        className="group relative mb-6 break-inside-avoid overflow-hidden rounded-xl cursor-pointer border border-transparent hover:border-primary/20"
                         style={{
                           opacity: visibleItems.has(itemIndex) ? 1 : 0,
                           transform: visibleItems.has(itemIndex)
-                            ? "translateY(0) scale(1)"
-                            : "translateY(50px) scale(0.95)",
+                            ? "translate3d(0, 0, 0) scale(1)"
+                            : "translate3d(0, 50px, 0) scale(0.95)",
+                          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                          backfaceVisibility: "hidden",
+                          WebkitBackfaceVisibility: "hidden",
+                          perspective: "1000px",
                         }}
                       >
                         {item.fileType.startsWith("video/") ? (
