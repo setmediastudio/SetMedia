@@ -1,0 +1,392 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.auth-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+  background: #25252b;
+}
+
+.auth-container .form-box {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  /* Added will-change for smoother animations */
+  will-change: transform, opacity;
+  /* Added overflow-y auto for scrolling when content is too tall */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar styling for form boxes */
+.auth-container .form-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.auth-container .form-box::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.auth-container .form-box::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+}
+
+.auth-container .form-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
+}
+
+.form-box.login-form {
+  left: 0;
+  /* Reduced padding by 10% (40px -> 36px) */
+  padding: 0 36px;
+}
+
+.form-box.login-form .animation {
+  transform: translateX(0%);
+  transition: 0.7s;
+  opacity: 1;
+  transition-delay: calc(0.1s * var(--S));
+  /* Added will-change for GPU acceleration */
+  will-change: transform, opacity, filter;
+}
+
+.auth-container.active .form-box.login-form .animation {
+  transform: translateX(-120%);
+  opacity: 0;
+  transition-delay: calc(0.1s * var(--D));
+}
+
+.form-box.register-form {
+  right: 0;
+  /* Reduced padding by 10% (40px -> 36px) */
+  padding: 0 36px;
+}
+
+.form-box.register-form .animation {
+  transform: translateX(120%);
+  transition: 0.7s ease;
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--S));
+  /* Added will-change for GPU acceleration */
+  will-change: transform, opacity, filter;
+}
+
+.auth-container.active .form-box.register-form .animation {
+  transform: translateX(0%);
+  opacity: 1;
+  filter: blur(0px);
+  transition-delay: calc(0.1s * var(--li));
+}
+
+.info-content {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  color: #fff;
+}
+
+.info-content.login-info {
+  right: 0;
+  text-align: right;
+  /* Reduced padding by 10% */
+  padding: 0 36px 54px 135px;
+}
+
+.info-content.login-info .animation {
+  transform: translateX(0);
+  transition: 0.7s ease;
+  transition-delay: calc(0.1s * var(--S));
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.auth-container.active .info-content.login-info .animation {
+  transform: translateX(120%);
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--D));
+}
+
+.info-content.register-info {
+  left: 0;
+  text-align: left;
+  /* Reduced padding by 10% */
+  padding: 0 135px 54px 36px;
+  pointer-events: none;
+}
+
+.info-content.register-info .animation {
+  transform: translateX(-120%);
+  transition: 0.7s ease;
+  opacity: 0;
+  filter: blur(10px);
+  transition-delay: calc(0.1s * var(--S));
+}
+
+.auth-container.active .info-content.register-info .animation {
+  transform: translateX(0%);
+  opacity: 1;
+  filter: blur(0);
+  transition-delay: calc(0.1s * var(--li));
+}
+
+.auth-container .curved-shape {
+  position: absolute;
+  right: 0;
+  top: -5px;
+  height: 110vh;
+  width: 60%;
+  background: linear-gradient(45deg, #25252b, #3b82f6);
+  transform: rotate(10deg) skewY(40deg);
+  transform-origin: bottom right;
+  transition: 1.5s ease;
+  transition-delay: 1.6s;
+  /* Added will-change for smoother shape animations */
+  will-change: transform;
+}
+
+.auth-container.active .curved-shape {
+  transform: rotate(0deg) skewY(0deg);
+  transition-delay: 0.5s;
+}
+
+.auth-container .curved-shape2 {
+  position: absolute;
+  left: 20%;
+  top: 100%;
+  height: 110vh;
+  width: 60%;
+  background: #25252b;
+  border-top: 3px solid #3b82f6;
+  transform: rotate(0deg) skewY(0deg);
+  transform-origin: bottom left;
+  transition: 1.5s ease;
+  transition-delay: 0.5s;
+  /* Added will-change for smoother shape animations */
+  will-change: transform;
+}
+
+.auth-container.active .curved-shape2 {
+  transform: rotate(-11deg) skewY(-41deg);
+  transition-delay: 1.2s;
+}
+
+.auth-input-box {
+  position: relative;
+  width: 100%;
+  /* Reduced height by 10% (50px -> 45px) */
+  height: 45px;
+  /* Reduced margin by 10% (25px -> 22px) */
+  margin-top: 22px;
+}
+
+.auth-input-box input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  /* Reduced font size by 10% (16px -> 14.4px, rounded to 14px) */
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid #fff;
+  padding-right: 30px;
+  transition: 0.5s;
+}
+
+.auth-input-box input:focus,
+.auth-input-box input:valid {
+  border-bottom: 2px solid #3b82f6;
+}
+
+.auth-input-box label {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  /* Reduced font size by 10% (16px -> 14.4px, rounded to 14px) */
+  font-size: 14px;
+  color: #fff;
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.auth-input-box input:focus ~ label,
+.auth-input-box input:valid ~ label {
+  top: -5px;
+  color: #3b82f6;
+  /* Reduced font size by 10% (14px -> 12.6px, rounded to 13px) */
+  font-size: 13px;
+}
+
+.auth-input-box .input-icon {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  /* Reduced icon size by 10% (18px -> 16px) */
+  font-size: 16px;
+  transform: translateY(-50%);
+  color: #fff;
+  transition: 0.5s;
+}
+
+.auth-input-box input:focus ~ .input-icon,
+.auth-input-box input:valid ~ .input-icon {
+  color: #3b82f6;
+}
+
+.auth-btn {
+  position: relative;
+  width: 100%;
+  /* Reduced height by 10% (45px -> 40px) */
+  height: 40px;
+  background: transparent;
+  border-radius: 40px;
+  cursor: pointer;
+  /* Reduced font size by 10% (16px -> 14.4px, rounded to 14px) */
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid #3b82f6;
+  overflow: hidden;
+  z-index: 1;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.auth-btn::before {
+  content: "";
+  position: absolute;
+  height: 300%;
+  width: 100%;
+  background: linear-gradient(#25252b, #3b82f6, #25252b, #3b82f6);
+  top: -100%;
+  left: 0;
+  z-index: -1;
+  transition: 0.5s;
+}
+
+.auth-btn:hover::before {
+  top: 0;
+}
+
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Enhanced button styles for Google OAuth */
+.auth-btn.google-btn {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.auth-btn.google-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced checkbox styles */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  display: block;
+  text-align: center;
+  color: white;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Enhanced focus states */
+.auth-input-box input:focus {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.auth-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.auth-link {
+  /* Reduced font size by 10% (14px -> 12.6px, rounded to 13px) */
+  font-size: 13px;
+  text-align: center;
+  /* Reduced margin by 10% (20px -> 18px, 10px -> 9px) */
+  margin: 18px 0 9px;
+  color: #fff;
+}
+
+.auth-link a {
+  text-decoration: none;
+  color: #3b82f6;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    height: 100vh;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .auth-container .form-box,
+  .info-content {
+    width: 100%;
+    position: relative;
+    /* Reduced mobile padding by 10% (40px 30px -> 36px 27px) */
+    padding: 36px 27px !important;
+  }
+
+  .info-content {
+    display: none;
+  }
+
+  .curved-shape,
+  .curved-shape2 {
+    display: none;
+  }
+
+  .form-box.login-form .animation,
+  .form-box.register-form .animation {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    filter: blur(0) !important;
+  }
+
+  .auth-container.active .form-box.login-form {
+    display: none;
+  }
+
+  .auth-container:not(.active) .form-box.register-form {
+    display: none;
+  }
+}
