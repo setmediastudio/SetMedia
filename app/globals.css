@@ -226,14 +226,20 @@ body {
     backface-visibility: hidden;
   }
 
-  /* Portfolio masonry optimization */
-  .columns-1,
-  .columns-2,
-  .columns-3,
-  .columns-4 {
-    content-visibility: auto;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+  /* Safari-specific grid fixes for proper spacing */
+  .grid {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  .gap-4 {
+    gap: 1rem;
+    -webkit-gap: 1rem;
+  }
+
+  .gap-6 {
+    gap: 1.5rem;
+    -webkit-gap: 1.5rem;
   }
 
   /* Safari and Chrome GPU acceleration for smooth animations */
@@ -503,6 +509,44 @@ body {
   .animate-pulse-glow,
   .shimmer::after {
     animation: none;
+  }
+}
+
+/* Safari-specific hover and transition optimization */
+@supports (-webkit-appearance: none) {
+  .group {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .group img,
+  .group video {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Ensure smooth transitions in Safari */
+  .transition-all,
+  .transition-opacity,
+  .transition-transform {
+    -webkit-transition-timing-function: ease;
+    transition-timing-function: ease;
+  }
+
+  /* Fix Safari's hover state flickering */
+  button:hover,
+  a:hover,
+  .group:hover {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Prevent Safari layout shifts during hover */
+  img,
+  video {
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
   }
 }
 

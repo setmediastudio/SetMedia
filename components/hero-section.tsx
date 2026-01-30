@@ -8,10 +8,31 @@ import { useEffect, useRef, useState } from "react"
 export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [showLoader, setShowLoader] = useState(true)
   const [scrollY, setScrollY] = useState(0)
+  const [videoError, setVideoError] = useState(false)
 
   const scrollToBooking = () => {
     document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const handleVideoLoad = () => {
+    setVideoLoaded(true)
+    // Hide loader after video is ready with smooth transition
+    setTimeout(() => setShowLoader(false), 500)
+  }
+
+  const handleVideoError = () => {
+    console.error("Video failed to load")
+    setVideoError(true)
+    // Hide loader immediately on error to show content
+    setTimeout(() => setShowLoader(false), 300)
+  }
+
+  const handleVideoCanPlay = () => {
+    setVideoLoaded(true)
+    // Hide loader after video is ready with smooth transition
+    setTimeout(() => setShowLoader(false), 500)
   }
 
   useEffect(() => {
@@ -24,13 +45,17 @@ export function HeroSection() {
       })
     }
 
-    playVideo()
-    video.addEventListener("loadedmetadata", playVideo)
-    video.addEventListener("canplay", playVideo)
+    // Attempt to play video when metadata is loaded
+    const handleCanPlay = () => {
+      playVideo()
+    }
+
+    video.addEventListener("canplay", handleCanPlay)
+    video.addEventListener("loadedmetadata", handleCanPlay)
 
     return () => {
-      video.removeEventListener("loadedmetadata", playVideo)
-      video.removeEventListener("canplay", playVideo)
+      video.removeEventListener("canplay", handleCanPlay)
+      video.removeEventListener("loadedmetadata", handleCanPlay)
     }
   }, [])
 
@@ -43,32 +68,59 @@ export function HeroSection() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleVideoLoad = () => {
-    setVideoLoaded(true)
-  }
+  // Fallback: hide loader after 4 seconds to ensure content is visible
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowLoader(false)
+    }, 4000)
+
+    return () => clearTimeout(timeout)
+  }, [])
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black">
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        poster="/cinematic-photography-studio-behind-the-scenes.jpg"
-        onLoadedData={handleVideoLoad}
-        onCanPlay={handleVideoLoad}
-        style={{
-          transform: `translateY(${scrollY * 0.5}px) scale(${1 + scrollY * 0.0002})`,
-        }}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-          videoLoaded ? "opacity-100" : "opacity-50"
-        }`}
-      >
-        <source src="/images/files-blob-setmedia1-public-hero-1.webm" type="video/webm" />
-        <source src="/images/files-blob-setmedia1-public-hero-1.mp4" type="video/mp4" />
-      </video>
+      {/* Video Loading Animation Overlay */}
+      {showLoader && (
+        <div className={`absolute inset-0 z-40 flex items-center justify-center bg-black/90 backdrop-blur-md transition-all duration-700 ${
+          showLoader ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}>
+          <div className="relative flex flex-col items-center gap-6">
+            {/* Main loader spinner */}
+            <div className="loader"></div>
+            
+            {/* Loading text */}
+            <div className="text-center space-y-2">
+              <p className="text-base text-white/80 font-medium animate-pulse">Loading cinematic experience...</p>
+              <p className="text-xs text-white/50">Preparing your visual journey</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Background video with proper loading states */}
+      <div className="absolute inset-0 h-full w-full bg-black overflow-hidden">
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23000' width='1920' height='1080'/%3E%3C/svg%3E"
+          onCanPlay={handleVideoCanPlay}
+          onLoadedData={handleVideoCanPlay}
+          onError={handleVideoError}
+          style={{
+            transform: `translateY(${scrollY * 0.5}px) scale(${1 + scrollY * 0.0002})`,
+          }}
+          className={`h-full w-full object-cover transition-opacity duration-700 ${
+            videoLoaded ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {/* Try multiple video sources for better compatibility */}
+          <source src="https://videos.pexels.com/video-files/3571468/3571468-sd_640_360_25fps.mp4" type="video/mp4" />
+        </video>
+      </div>
 
       {/* Dark Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 pointer-events-none" />
@@ -114,7 +166,7 @@ export function HeroSection() {
             <Button
               asChild
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white text-xs xs:text-sm sm:text-base px-5 xs:px-6 sm:px-8 py-4 xs:py-5 sm:py-6 h-auto font-semibold w-full sm:w-auto min-w-[180px]"
+              className="border-white/30 text-white hover:bg-white/10 hover:text-white text-xs xs:text-sm sm:text-base px-5 xs:px-6 sm:px-8 py-4 xs:py-5 sm:py-6 h-auto font-semibold w-full sm:w-auto min-w-[180px] bg-transparent"
             >
               <Link href="/work">
                 Explore Our Work
@@ -128,6 +180,47 @@ export function HeroSection() {
           <ChevronDown className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-primary" />
         </div>
       </div>
+
+      {/* CSS for loader */}
+      <style jsx>{`
+        .loader {
+          width: 70px;
+          aspect-ratio: 1;
+          display: grid;
+          border: 4px solid transparent;
+          border-radius: 50%;
+          border-color: rgba(212, 165, 94, 0.2) transparent;
+          animation: l16 1s infinite linear;
+          position: relative;
+        }
+        .loader::before,
+        .loader::after {    
+          content: "";
+          grid-area: 1/1;
+          margin: 2px;
+          border: inherit;
+          border-radius: 50%;
+          animation: inherit;
+        }
+        .loader::before {
+          border-color: rgba(212, 165, 94, 0.8) transparent;
+          animation-duration: .5s;
+          animation-direction: reverse;
+        }
+        .loader::after {
+          margin: 8px;
+          border-color: rgba(212, 165, 94, 0.4) transparent;
+          animation-duration: 2s;
+        }
+        @keyframes l16 { 
+          100% { transform: rotate(1turn); }
+        }
+        
+        /* Optional glow effect for the loader */
+        .loader::before {
+          box-shadow: 0 0 20px rgba(212, 165, 94, 0.3);
+        }
+      `}</style>
     </section>
   )
 }

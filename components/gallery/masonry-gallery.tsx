@@ -52,7 +52,7 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
     return (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">{title}</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-max">
           {items.map((item, idx) => {
             const globalIndex = startIndex + idx
             const isVideo = item.fileType.startsWith("video/")
@@ -61,13 +61,32 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
             return (
               <div
                 key={item._id}
-                className="group relative overflow-hidden rounded-lg bg-muted cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] aspect-square"
+                className="group relative overflow-hidden rounded-lg bg-muted cursor-pointer transition-all duration-300 will-change-transform"
                 onClick={() => setSelectedIndex(globalIndex)}
+                style={{
+                  aspectRatio: "1/1",
+                  transform: "translate3d(0, 0, 0)",
+                  WebkitTransform: "translate3d(0, 0, 0)",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  WebkitBackfaceVisibility: "hidden",
+                }}
+                onMouseEnter={(e) => {
+                  const element = e.currentTarget as HTMLElement
+                  element.style.boxShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.4)"
+                  element.style.transform = "translate3d(0, 0, 0) scale(1.02)"
+                  element.style.WebkitTransform = "translate3d(0, 0, 0) scale(1.02)"
+                }}
+                onMouseLeave={(e) => {
+                  const element = e.currentTarget as HTMLElement
+                  element.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)"
+                  element.style.transform = "translate3d(0, 0, 0) scale(1)"
+                  element.style.WebkitTransform = "translate3d(0, 0, 0) scale(1)"
+                }}
               >
                 {isVideo ? (
-                  <div className="relative w-full h-full">
-                    <video src={item.publicUrl} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <div className="relative w-full h-full" style={{ transform: "translate3d(0, 0, 0)" }}>
+                    <video src={item.publicUrl} className="w-full h-full object-cover" style={{ transform: "translate3d(0, 0, 0)" }} />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
                       <Play className="h-12 w-12 text-white" />
                     </div>
                   </div>
@@ -79,11 +98,22 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                   <img
                     src={item.publicUrl || "/placeholder.svg"}
                     alt={item.originalName}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover transition-transform duration-300 will-change-transform"
+                    style={{ transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}
                     onError={() => handleImageError(item._id)}
+                    onMouseEnter={(e) => {
+                      const img = e.currentTarget as HTMLImageElement
+                      img.style.transform = "translate3d(0, 0, 0) scale(1.1)"
+                      img.style.WebkitTransform = "translate3d(0, 0, 0) scale(1.1)"
+                    }}
+                    onMouseLeave={(e) => {
+                      const img = e.currentTarget as HTMLImageElement
+                      img.style.transform = "translate3d(0, 0, 0)"
+                      img.style.WebkitTransform = "translate3d(0, 0, 0)"
+                    }}
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out pointer-events-none" style={{ WebkitTransition: "opacity 0.3s ease-out", WebkitBackfaceVisibility: "hidden" }} onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }} onMouseLeave={(e) => { e.currentTarget.style.opacity = "0" }}>
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-white text-sm font-medium truncate">{item.originalName}</p>
                   </div>

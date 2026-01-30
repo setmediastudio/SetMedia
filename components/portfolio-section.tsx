@@ -339,7 +339,7 @@ export function PortfolioSection() {
             {groupedItems.map((group, groupIndex) => (
               <div key={group.categoryName} className="space-y-6">
                 <h3 className="text-2xl font-semibold text-foreground border-b pb-3">{group.categoryName}</h3>
-                <div className="columns-1 gap-6 md:columns-2 lg:columns-3 xl:columns-4">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-max">
                   {group.items.map((item, index) => {
                     const itemIndex = groupIndex * 100 + index
                     return (
@@ -348,16 +348,17 @@ export function PortfolioSection() {
                         ref={(el) => {
                           itemRefs.current[itemIndex] = el
                         }}
-                        className="group relative mb-6 break-inside-avoid overflow-hidden rounded-xl cursor-pointer border border-transparent hover:border-primary/20"
+                        className="group relative overflow-hidden rounded-xl cursor-pointer border border-transparent hover:border-primary/20 transition-all duration-300"
                         style={{
                           opacity: visibleItems.has(itemIndex) ? 1 : 0,
                           transform: visibleItems.has(itemIndex)
                             ? "translate3d(0, 0, 0) scale(1)"
                             : "translate3d(0, 50px, 0) scale(0.95)",
-                          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease",
                           backfaceVisibility: "hidden",
                           WebkitBackfaceVisibility: "hidden",
                           perspective: "1000px",
+                          WebkitPerspective: "1000px",
                         }}
                       >
                         {item.fileType.startsWith("video/") ? (
@@ -390,18 +391,27 @@ export function PortfolioSection() {
                             </Badge>
                           </div>
                         ) : (
-                          <div className="relative w-full bg-muted overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                          <div className="relative w-full bg-muted overflow-hidden" style={{ aspectRatio: "1/1", transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}>
                             <ImageSkeletonLoader
                               src={item.sdPublicUrl || item.publicUrl || "/placeholder.svg"}
                               alt={item.title || item.originalName}
                               fallbackSrc={item.publicUrl || "/placeholder.svg"}
-                              className="w-full h-full transition-transform duration-500 group-hover:scale-105"
+                              className="w-full h-full transition-transform duration-500 will-change-transform"
+                              style={{ transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}
                               aspectRatio="square"
+                              onMouseEnter={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.transform = "translate3d(0, 0, 0) scale(1.05)";
+                              }}
+                              onMouseLeave={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.transform = "translate3d(0, 0, 0) scale(1)";
+                              }}
                             />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                          <div className="absolute bottom-4 left-4 right-4">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto" style={{ WebkitTransition: "opacity 0.3s ease-out", WebkitBackfaceVisibility: "hidden" }}>
+                          <div className="absolute bottom-4 left-4 right-4" style={{ WebkitTransform: "translate3d(0, 0, 0)" }}>
                             {item.title && <p className="text-lg font-semibold text-white mb-1">{item.title}</p>}
                             {item.description && (
                               <p className="text-sm text-white/80 line-clamp-2 mb-2">{item.description}</p>
