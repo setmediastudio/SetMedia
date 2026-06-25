@@ -66,9 +66,9 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                 style={{
                   aspectRatio: "1/1",
                   transform: "translate3d(0, 0, 0)",
-                  webkitTransform: "translate3d(0, 0, 0)",
+                  WebkitTransform: "translate3d(0, 0, 0)",
                   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                  webkitBackfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
                 }}
                 onMouseEnter={(e) => {
                   const element = e.currentTarget as HTMLElement
@@ -99,7 +99,7 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                     src={item.publicUrl || "/placeholder.svg"}
                     alt={item.originalName}
                     className="w-full h-full object-cover transition-transform duration-300 will-change-transform"
-                    style={{ transform: "translate3d(0, 0, 0)", webkitTransform: "translate3d(0, 0, 0)" }}
+                    style={{ transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}
                     onError={() => handleImageError(item._id)}
                     onMouseEnter={(e) => {
                       const img = e.currentTarget as HTMLImageElement
@@ -113,7 +113,7 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                     }}
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out pointer-events-none" style={{ webkitTransition: "opacity 0.3s ease-out", webkitBackfaceVisibility: "hidden" }} onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }} onMouseLeave={(e) => { e.currentTarget.style.opacity = "0" }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out pointer-events-none" style={{ WebkitTransition: "opacity 0.3s ease-out", WebkitBackfaceVisibility: "hidden" }} onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }} onMouseLeave={(e) => { e.currentTarget.style.opacity = "0" }}>
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-white text-sm font-medium truncate">{item.originalName}</p>
                   </div>
