@@ -24,7 +24,7 @@ const openSans = Open_Sans({
 export const metadata: Metadata = {
   title: "Set Media - Capturing Stories Beyond the Frame",
   description: "Luxury cinematic photography and videography studio. Transform moments into timeless stories.",
-  generator: "v0.dev",
+  generator: "csm.tech",
 }
 
 export default function RootLayout({

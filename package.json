@@ -1,5 +1,5 @@
 {
-  "name": "my-v0-project",
+  "name": "setmedia",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "install": "npm install --legacy-peer-deps"
+    "postinstall": "node -e \"console.log('Dependencies installed')\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.709.0",
