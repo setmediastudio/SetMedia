@@ -6,3 +6,8 @@ declare global {
     promise: Promise<typeof mongoose> | null
   }
 }
+
+declare module "*.css" {
+  const content: Record<string, string>
+  export default content
+}

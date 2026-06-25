@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Download, X, ChevronLeft, ChevronRight, Play } from "lucide-react"
-import { getMasonryClass } from "@/utils/getMasonryClass" // Assuming getMasonryClass is a utility function
+
 
 interface MasonryGalleryProps {
   items: Array<{
@@ -66,21 +66,21 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                 style={{
                   aspectRatio: "1/1",
                   transform: "translate3d(0, 0, 0)",
-                  WebkitTransform: "translate3d(0, 0, 0)",
+                  webkitTransform: "translate3d(0, 0, 0)",
                   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                  WebkitBackfaceVisibility: "hidden",
+                  webkitBackfaceVisibility: "hidden",
                 }}
                 onMouseEnter={(e) => {
                   const element = e.currentTarget as HTMLElement
                   element.style.boxShadow = "0 20px 25px -5px rgba(0, 0, 0, 0.4)"
                   element.style.transform = "translate3d(0, 0, 0) scale(1.02)"
-                  element.style.WebkitTransform = "translate3d(0, 0, 0) scale(1.02)"
+                  element.style.webkitTransform = "translate3d(0, 0, 0) scale(1.02)"
                 }}
                 onMouseLeave={(e) => {
                   const element = e.currentTarget as HTMLElement
                   element.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)"
                   element.style.transform = "translate3d(0, 0, 0) scale(1)"
-                  element.style.WebkitTransform = "translate3d(0, 0, 0) scale(1)"
+                  element.style.webkitTransform = "translate3d(0, 0, 0) scale(1)"
                 }}
               >
                 {isVideo ? (
@@ -99,21 +99,21 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
                     src={item.publicUrl || "/placeholder.svg"}
                     alt={item.originalName}
                     className="w-full h-full object-cover transition-transform duration-300 will-change-transform"
-                    style={{ transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}
+                    style={{ transform: "translate3d(0, 0, 0)", webkitTransform: "translate3d(0, 0, 0)" }}
                     onError={() => handleImageError(item._id)}
                     onMouseEnter={(e) => {
                       const img = e.currentTarget as HTMLImageElement
                       img.style.transform = "translate3d(0, 0, 0) scale(1.1)"
-                      img.style.WebkitTransform = "translate3d(0, 0, 0) scale(1.1)"
+                      img.style.webkitTransform = "translate3d(0, 0, 0) scale(1.1)"
                     }}
                     onMouseLeave={(e) => {
                       const img = e.currentTarget as HTMLImageElement
                       img.style.transform = "translate3d(0, 0, 0)"
-                      img.style.WebkitTransform = "translate3d(0, 0, 0)"
+                      img.style.webkitTransform = "translate3d(0, 0, 0)"
                     }}
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out pointer-events-none" style={{ WebkitTransition: "opacity 0.3s ease-out", WebkitBackfaceVisibility: "hidden" }} onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }} onMouseLeave={(e) => { e.currentTarget.style.opacity = "0" }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out pointer-events-none" style={{ webkitTransition: "opacity 0.3s ease-out", webkitBackfaceVisibility: "hidden" }} onMouseEnter={(e) => { e.currentTarget.style.opacity = "1" }} onMouseLeave={(e) => { e.currentTarget.style.opacity = "0" }}>
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-white text-sm font-medium truncate">{item.originalName}</p>
                   </div>
@@ -198,7 +198,7 @@ export function MasonryGallery({ items, layout = "masonry", allowDownload = true
               <div className="absolute bottom-4 left-4 z-10 text-white">
                 <p className="text-sm font-medium">{selectedItem.originalName}</p>
                 <p className="text-xs text-white/70">
-                  {selectedIndex + 1} of {allItems.length}
+                  {selectedIndex! + 1} of {allItems.length}
                 </p>
               </div>
             </div>

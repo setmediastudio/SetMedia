@@ -239,7 +239,6 @@ export default function HomePage() {
             preload="auto"
             crossOrigin="anonymous"
             poster="/hero-poster.webp"
-            defaultMuted
             disablePictureInPicture
             disableRemotePlayback
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 will-change-opacity gpu-accelerated ${

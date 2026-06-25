@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth/next"
 import { connectDB } from "@/lib/mongodb"
 import ActivityLog from "@/models/ActivityLog"
 
