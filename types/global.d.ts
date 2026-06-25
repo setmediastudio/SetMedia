@@ -6,5 +6,3 @@ declare global {
     promise: Promise<typeof mongoose> | null
   }
 }
-
-declare module "*.css" {}
