@@ -1,11 +1,21 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useEffect, useState } from "react"
 
 const ParticlesBackground = memo(function ParticlesBackground() {
+  const [shouldRender, setShouldRender] = useState(false)
+
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setShouldRender(true)
+    })
+    return () => cancelAnimationFrame(timer)
+  }, [])
+
+  if (!shouldRender) return null
+
   return (
-    <div className="particles-container" aria-hidden="true">
-      {/* Static particles with CSS animations */}
+    <div className="particles-container" aria-hidden="true" style={{ willChange: "transform, opacity" }}>
       <div className="particle particle-1" />
       <div className="particle particle-2" />
       <div className="particle particle-3" />
@@ -18,14 +28,6 @@ const ParticlesBackground = memo(function ParticlesBackground() {
       <div className="particle particle-10" />
       <div className="particle particle-11" />
       <div className="particle particle-12" />
-      <div className="particle particle-13" />
-      <div className="particle particle-14" />
-      <div className="particle particle-15" />
-      <div className="particle particle-16" />
-      <div className="particle particle-17" />
-      <div className="particle particle-18" />
-      <div className="particle particle-19" />
-      <div className="particle particle-20" />
     </div>
   )
 })

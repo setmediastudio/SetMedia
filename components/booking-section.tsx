@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useAuthModal } from "@/lib/auth-modal-context"
 import { Calendar, Clock, Sparkles, CheckCircle2 } from "lucide-react"
+import Image from "next/image"
 
 export function BookingSection() {
   const { data: session, status } = useSession()
@@ -18,26 +19,11 @@ export function BookingSection() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
 
   const today = new Date()
   const minDate = today.toISOString().split("T")[0]
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect()
-        const scrollProgress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight))
-        setScrollY(scrollProgress * 100)
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    handleScroll()
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -101,18 +87,15 @@ export function BookingSection() {
 
   return (
     <section ref={sectionRef} id="booking" className="relative py-16 sm:py-24 px-4 bg-transparent overflow-hidden">
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.3}px)`,
-          transition: "transform 0.1s ease-out",
-        }}
-      >
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url("/portrait.jpg")',
-          }}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Image
+          src="/IMG_3051.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          quality={90}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />

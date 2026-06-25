@@ -2,10 +2,36 @@ export const dynamic = "force-dynamic"
 
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
+import mongoose from "mongoose"
 import { authOptions } from "@/lib/auth"
 import dbConnect from "@/lib/mongodb"
 import PortfolioCategory from "@/models/PortfolioCategory"
 import Upload from "@/models/Upload"
+import { deleteUploadRecordsByIds, deleteUploadAssetsBatch, runTransactionWithRetry } from "@/lib/upload-cleanup"
+
+async function getCategoryTreeIds(rootCategoryId: string): Promise<string[]> {
+  const categoryIds = new Set<string>([rootCategoryId])
+  const queue = [rootCategoryId]
+
+  while (queue.length > 0) {
+    const parentCategoryId = queue.shift()
+    if (!parentCategoryId) continue
+
+    const children = (await PortfolioCategory.find({ parentCategoryId }).select("_id").lean()) as Array<{
+      _id: mongoose.Types.ObjectId
+    }>
+
+    for (const child of children) {
+      const childId = child._id.toString()
+      if (categoryIds.has(childId)) continue
+
+      categoryIds.add(childId)
+      queue.push(childId)
+    }
+  }
+
+  return [...categoryIds]
+}
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -66,32 +92,29 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     await dbConnect()
 
-    const uploadsCount = await Upload.countDocuments({ portfolioCategory: params.id })
-    const subCategoriesCount = await PortfolioCategory.countDocuments({ parentCategoryId: params.id })
-
-    if (uploadsCount > 0) {
-      return NextResponse.json(
-        { error: `Cannot delete category with ${uploadsCount} uploads. Please reassign or delete uploads first.` },
-        { status: 400 },
-      )
-    }
-
-    if (subCategoriesCount > 0) {
-      return NextResponse.json(
-        {
-          error: `Cannot delete category with ${subCategoriesCount} sub-categories. Please delete sub-categories first.`,
-        },
-        { status: 400 },
-      )
-    }
-
-    const category = await PortfolioCategory.findByIdAndDelete(params.id)
+    const category = await PortfolioCategory.findById(params.id).select("_id")
 
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true })
+    const categoryIds = await getCategoryTreeIds(params.id)
+    const uploads = await Upload.find({ portfolioCategory: { $in: categoryIds } })
+    await deleteUploadAssetsBatch(uploads)
+
+    const uploadIds = uploads.map((upload) => upload._id as mongoose.Types.ObjectId)
+    await runTransactionWithRetry(async (dbSession) => {
+      await deleteUploadRecordsByIds(uploadIds, dbSession)
+      await PortfolioCategory.deleteMany({ _id: { $in: categoryIds } }, { session: dbSession })
+    })
+
+    return NextResponse.json({
+      success: true,
+      deleted: {
+        categories: categoryIds.length,
+        uploads: uploads.length,
+      },
+    })
   } catch (error) {
     console.error("Portfolio category deletion error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

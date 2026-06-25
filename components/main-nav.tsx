@@ -26,11 +26,25 @@ export function MainNav() {
   const { openSignIn, openSignUp } = useAuthModal()
 
   useEffect(() => {
+    let ticking = false
+    let lastScrolled = false
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      if (ticking) return
+
+      ticking = true
+      window.requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 50
+        if (nextScrolled !== lastScrolled) {
+          lastScrolled = nextScrolled
+          setIsScrolled(nextScrolled)
+        }
+        ticking = false
+      })
     }
 
-    window.addEventListener("scroll", handleScroll)
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 

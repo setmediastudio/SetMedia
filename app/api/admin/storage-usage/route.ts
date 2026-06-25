@@ -3,7 +3,8 @@ export const dynamic = "force-dynamic"
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3"
+import dbConnect from "@/lib/mongodb"
+import Upload from "@/models/Upload"
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,50 +14,39 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Initialize S3 client for Cloudflare R2
-    const s3Client = new S3Client({
-      region: "auto",
-      endpoint: process.env.R2_ENDPOINT,
-      credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+    await dbConnect()
+
+    const usage = await Upload.aggregate([
+      {
+        $group: {
+          _id: null,
+          hdUsed: { $sum: { $ifNull: ["$fileSize", 0] } },
+          sdUsed: { $sum: { $ifNull: ["$sdFileSize", 0] } },
+          uploadsCount: { $sum: 1 },
+        },
       },
-    })
+    ])
 
-    let totalSize = 0
-    const buckets = [process.env.R2_IMAGE_BUCKET_NAME, process.env.R2_VIDEO_BUCKET_NAME].filter(Boolean)
-
-    // Calculate total storage used across all buckets
-    for (const bucket of buckets) {
-      let continuationToken: string | undefined = undefined
-
-      do {
-        const command = new ListObjectsV2Command({
-          Bucket: bucket,
-          ContinuationToken: continuationToken,
-        })
-
-        const response = await s3Client.send(command)
-
-        if (response.Contents) {
-          for (const object of response.Contents) {
-            totalSize += object.Size || 0
-          }
-        }
-
-        continuationToken = response.NextContinuationToken
-      } while (continuationToken)
-    }
+    const hdUsed = usage[0]?.hdUsed || 0
+    const sdUsed = usage[0]?.sdUsed || 0
+    const totalSize = hdUsed + sdUsed
 
     // 10GB free tier limit in bytes
     const totalLimit = 10737418240
-
-    return NextResponse.json({
+    const available = Math.max(totalLimit - totalSize, 0)
+    const response = NextResponse.json({
       used: totalSize,
+      usedHd: hdUsed,
+      usedSd: sdUsed,
       total: totalLimit,
-      available: totalLimit - totalSize,
-      percentage: (totalSize / totalLimit) * 100,
+      available,
+      uploadsCount: usage[0]?.uploadsCount || 0,
+      percentage: totalLimit > 0 ? (totalSize / totalLimit) * 100 : 0,
+      source: "database",
     })
+
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+    return response
   } catch (error) {
     console.error("Storage usage API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

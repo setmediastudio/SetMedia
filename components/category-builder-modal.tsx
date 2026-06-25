@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Plus, Trash2, ChevronRight, AlertCircle, Edit2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { notifyStorageUsageUpdated } from "@/lib/storage-usage-events"
 
 interface SubCategoryInput {
   id: string
@@ -256,6 +257,7 @@ export function CategoryBuilderModal({ open, onOpenChange, onSuccess }: Category
           title: "Deleted successfully",
           description: "Category deleted successfully.",
         })
+        notifyStorageUsageUpdated()
         fetchCategories()
       } else {
         const error = await response.json()

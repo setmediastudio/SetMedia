@@ -38,6 +38,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileCard } from "@/components/uploads/file-card"
 import { CategoryBuilderModal } from "@/components/category-builder-modal"
+import { notifyStorageUsageUpdated } from "@/lib/storage-usage-events"
 
 interface UploadType {
   _id: string
@@ -191,6 +192,7 @@ export default function AdminUploadsPage() {
           title: "Success",
           description: "Category deleted successfully.",
         })
+        notifyStorageUsageUpdated()
         fetchCategories()
       } else {
         const error = await response.json()
@@ -267,6 +269,7 @@ export default function AdminUploadsPage() {
           description: "Files uploaded successfully.",
         })
 
+        notifyStorageUsageUpdated()
         resetUploadForm()
         setIsUploadDialogOpen(false)
         fetchUploads()
@@ -312,6 +315,7 @@ export default function AdminUploadsPage() {
           description: "Files uploaded successfully.",
         })
 
+        notifyStorageUsageUpdated()
         resetUploadForm()
         setIsUploadDialogOpen(false)
         fetchUploads()
@@ -566,6 +570,7 @@ export default function AdminUploadsPage() {
           title: "Success",
           description: "File deleted successfully.",
         })
+        notifyStorageUsageUpdated()
         fetchUploads()
       }
     } catch (error) {

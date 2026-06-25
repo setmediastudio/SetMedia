@@ -24,6 +24,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { MasonryGallery } from "@/components/gallery/masonry-gallery"
 import Link from "next/link"
+import { notifyStorageUsageUpdated } from "@/lib/storage-usage-events"
 
 export default function GalleryDetailPage() {
   const { data: session } = useSession()
@@ -115,6 +116,7 @@ export default function GalleryDetailPage() {
           title: "Success",
           description: `${data.count} file(s) uploaded successfully.`,
         })
+        notifyStorageUsageUpdated()
         setIsUploadDialogOpen(false)
         setSelectedFiles(null)
         fetchGallery()

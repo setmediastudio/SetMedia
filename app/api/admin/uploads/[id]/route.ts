@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import dbConnect from "@/lib/mongodb"
 import Upload from "@/models/Upload"
-import { deleteFromR2 } from "@/lib/r2-storage"
+import { deleteUploadWithReferences } from "@/lib/upload-cleanup"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -82,11 +82,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: "Upload not found" }, { status: 404 })
     }
 
-    // Delete from R2
-    await deleteFromR2(upload.storageKey, upload.bucket)
-
-    // Delete from database
-    await Upload.findByIdAndDelete(params.id)
+    await deleteUploadWithReferences(upload)
 
     return NextResponse.json({ success: true })
   } catch (error) {

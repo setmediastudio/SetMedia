@@ -87,7 +87,7 @@ export function PortfolioSection() {
 
   const fetchPortfolioData = async () => {
     try {
-      const response = await fetch("/api/portfolio")
+      const response = await fetch("/api/portfolio?limit=80")
       if (response.ok) {
         const data = await response.json()
         // Use allCategories to include both parent and sub-categories
@@ -396,17 +396,8 @@ export function PortfolioSection() {
                               src={item.sdPublicUrl || item.publicUrl || "/placeholder.svg"}
                               alt={item.title || item.originalName}
                               fallbackSrc={item.publicUrl || "/placeholder.svg"}
-                              className="w-full h-full transition-transform duration-500 will-change-transform"
-                              style={{ transform: "translate3d(0, 0, 0)", WebkitTransform: "translate3d(0, 0, 0)" }}
+                              className="w-full h-full transition-transform duration-500 group-hover:scale-105"
                               aspectRatio="square"
-                              onMouseEnter={(e) => {
-                                const target = e.currentTarget as HTMLImageElement;
-                                target.style.transform = "translate3d(0, 0, 0) scale(1.05)";
-                              }}
-                              onMouseLeave={(e) => {
-                                const target = e.currentTarget as HTMLImageElement;
-                                target.style.transform = "translate3d(0, 0, 0) scale(1)";
-                              }}
                             />
                           </div>
                         )}

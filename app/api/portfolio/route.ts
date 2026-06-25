@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
-
 import { type NextRequest, NextResponse } from "next/server"
 import dbConnect from "@/lib/mongodb"
 import PortfolioCategory from "@/models/PortfolioCategory"
 import Upload from "@/models/Upload"
 
-// Cache for 5 minutes (300 seconds)
+export const dynamic = "force-dynamic"
 export const revalidate = 300
 
 export async function GET(request: NextRequest) {

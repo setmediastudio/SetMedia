@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { STORAGE_USAGE_UPDATED_EVENT } from "@/lib/storage-usage-events"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -42,6 +43,7 @@ export function Sidebar({ user, onSignOut, isCollapsed = false }: SidebarProps) 
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [storageData, setStorageData] = useState({
     used: 0,
+    available: 10737418240,
     total: 10737418240, // 10GB in bytes
     loading: true,
   })
@@ -76,19 +78,25 @@ export function Sidebar({ user, onSignOut, isCollapsed = false }: SidebarProps) 
   useEffect(() => {
     if (isAdmin) {
       fetchStorageUsage()
+      const handleStorageUsageUpdated = () => fetchStorageUsage()
+      window.addEventListener(STORAGE_USAGE_UPDATED_EVENT, handleStorageUsageUpdated)
       // Refresh storage data every 30 seconds
       const interval = setInterval(fetchStorageUsage, 30000)
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+        window.removeEventListener(STORAGE_USAGE_UPDATED_EVENT, handleStorageUsageUpdated)
+      }
     }
   }, [isAdmin])
 
   const fetchStorageUsage = async () => {
     try {
-      const response = await fetch("/api/admin/storage-usage")
+      const response = await fetch("/api/admin/storage-usage", { cache: "no-store" })
       if (response.ok) {
         const data = await response.json()
         setStorageData({
           used: data.used,
+          available: data.available,
           total: data.total,
           loading: false,
         })
@@ -106,6 +114,7 @@ export function Sidebar({ user, onSignOut, isCollapsed = false }: SidebarProps) 
   }
 
   const getStoragePercentage = () => {
+    if (storageData.total === 0) return 0
     return (storageData.used / storageData.total) * 100
   }
 
@@ -186,9 +195,10 @@ export function Sidebar({ user, onSignOut, isCollapsed = false }: SidebarProps) 
                   <div className="text-xs text-sidebar-foreground/70">Loading...</div>
                 ) : (
                   <>
+                    <div className="text-lg font-semibold text-sidebar-foreground">{formatBytes(storageData.available)}</div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-sidebar-foreground font-semibold">{formatBytes(storageData.used)}</span>
-                      <span className="text-sidebar-foreground/70">/ {formatBytes(storageData.total)}</span>
+                      <span className="text-sidebar-foreground/70">Used {formatBytes(storageData.used)}</span>
+                      <span className="text-sidebar-foreground/70">Total {formatBytes(storageData.total)}</span>
                     </div>
                     <Progress value={getStoragePercentage()} className="h-2" />
                     <div className="flex justify-between text-xs">

@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 
 export function AuthModal() {
-  const { isOpen, mode, close, returnUrl } = useAuthModal()
+  const { isOpen, mode, close, openSignIn, openSignUp, returnUrl } = useAuthModal()
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -221,13 +221,7 @@ export function AuthModal() {
               Don't have an account?{" "}
               <button
                 type="button"
-                onClick={() => {
-                  close()
-                  setTimeout(() => {
-                    const { openSignUp } = require("@/lib/auth-modal-context")
-                    openSignUp()
-                  }, 100)
-                }}
+                onClick={openSignUp}
                 className="text-primary hover:underline font-medium"
               >
                 Sign up
@@ -238,13 +232,7 @@ export function AuthModal() {
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => {
-                  close()
-                  setTimeout(() => {
-                    const { openSignIn } = require("@/lib/auth-modal-context")
-                    openSignIn()
-                  }, 100)
-                }}
+                onClick={openSignIn}
                 className="text-primary hover:underline font-medium"
               >
                 Sign in

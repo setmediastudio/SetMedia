@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/auth-provider"
 import { AuthModalProvider } from "@/lib/auth-modal-context"
 import { AuthModal } from "@/components/auth-modal"
 import { Toaster } from "@/components/ui/toaster"
+import { PreloaderWrapper } from "@/components/preloader-wrapper"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -36,9 +37,11 @@ export default function RootLayout({
       <body className={openSans.className}>
         <AuthProvider>
           <AuthModalProvider>
-            {children}
-            <AuthModal />
-            <Toaster />
+            <PreloaderWrapper>
+              {children}
+              <AuthModal />
+              <Toaster />
+            </PreloaderWrapper>
           </AuthModalProvider>
         </AuthProvider>
       </body>

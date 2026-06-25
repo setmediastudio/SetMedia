@@ -2,31 +2,61 @@
 
 import { useEffect, useState } from "react"
 import { Camera } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface PreloaderProps {
-  onComplete: () => void
+  className?: string
 }
 
-export function Preloader({ onComplete }: PreloaderProps) {
-  const [isVisible, setIsVisible] = useState(true)
+export function Preloader({ className }: PreloaderProps) {
+  const [isHydrated, setIsHydrated] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-      setTimeout(onComplete, 500)
-    }, 2000)
+    setIsHydrated(true)
+  }, [])
 
-    return () => clearTimeout(timer)
-  }, [onComplete])
+  useEffect(() => {
+    if (!isHydrated) return
 
-  if (!isVisible) return null
+    setIsExiting(true)
+  }, [isHydrated])
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-      <div className="animate-pulse text-center">
-        <Camera className="h-24 w-24 text-primary mx-auto mb-4" />
-        <p className="font-serif text-3xl text-primary">Set Media</p>
+  if (!isHydrated) {
+    return (
+      <div
+        id="preloader"
+        className={cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-500",
+          className
+        )}
+        style={{ opacity: 1 }}
+      >
+        <div className="animate-pulse text-center">
+          <Camera className="h-24 w-24 text-primary mx-auto mb-4" />
+          <p className="font-serif text-3xl text-primary">Set Media</p>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  if (isExiting) {
+    return (
+      <div
+        id="preloader"
+        className={cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-500",
+          className
+        )}
+        style={{ opacity: 0, pointerEvents: "none" }}
+      >
+        <div className="animate-pulse text-center">
+          <Camera className="h-24 w-24 text-primary mx-auto mb-4" />
+          <p className="font-serif text-3xl text-primary">Set Media</p>
+        </div>
+      </div>
+    )
+  }
+
+  return null
 }

@@ -11,7 +11,7 @@ const testimonials = [
     id: 1,
     name: "Sarah & Michael",
     role: "Wedding Clients",
-    image: "/_IMG_9852.jpg",
+    image: "/icons/_IMG_9852.jpg",
     quote:
       "Set Media captured our wedding day in the most beautiful, cinematic way. Every photo tells a story, and we couldn't be happier with the results.",
     rating: 5,
@@ -20,7 +20,7 @@ const testimonials = [
     id: 2,
     name: "David Chen",
     role: "Corporate Event",
-    image: "/_IMG_9832.png",
+    image: "/icons/_IMG_9832.png",
     quote:
       "Professional, creative, and incredibly talented. They transformed our corporate event into a visual masterpiece. Highly recommended!",
     rating: 5,
@@ -29,7 +29,7 @@ const testimonials = [
     id: 3,
     name: "Amara Johnson",
     role: "Fashion Portfolio",
-    image: "/_IMG_9168.jpg",
+    image: "/icons/_IMG_9168.jpg",
     quote:
       "Working with Set Media was an absolute dream. Their attention to detail and artistic vision brought my portfolio to life in ways I never imagined.",
     rating: 5,

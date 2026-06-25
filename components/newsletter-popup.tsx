@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { X, Mail, CheckCircle2, Sparkles, Camera } from "lucide-react"
+import { Mail, CheckCircle2, Sparkles, Camera } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function NewsletterPopup() {
@@ -85,13 +85,6 @@ export function NewsletterPopup() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden border-primary/20 bg-card">
-        <button
-          onClick={handleClose}
-          className="absolute right-4 top-4 z-10 rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
         {!isSubscribed ? (
           <>
             <div className="relative bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8 pb-12">

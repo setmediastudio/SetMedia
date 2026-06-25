@@ -210,20 +210,11 @@ body {
   }
 
   .will-change-transform {
-    /* Removed will-change for Safari compatibility - use transform3d instead */
-    transform: translate3d(0, 0, 0);
+    transform: translateZ(0);
   }
 
   .transform {
-    transform: translate3d(0, 0, 0);
-  }
-
-  /* Image loading optimization */
-  img {
-    content-visibility: auto;
-    contain: layout style paint;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 
   /* Safari-specific grid fixes for proper spacing */
@@ -240,30 +231,6 @@ body {
   .gap-6 {
     gap: 1.5rem;
     -webkit-gap: 1.5rem;
-  }
-
-  /* Safari and Chrome GPU acceleration for smooth animations */
-  .group {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
-  }
-
-  .group img {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  /* Portfolio item Safari optimization - prevent flickering */
-  .group[style*="opacity"] {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    will-change: auto;
   }
 
   @keyframes float {
@@ -312,7 +279,6 @@ body {
   background: radial-gradient(circle, hsla(38, 85%, 60%, 0.9) 0%, hsla(38, 75%, 55%, 0.4) 50%, transparent 70%);
   border-radius: 50%;
   animation: particle-float linear infinite;
-  will-change: transform, opacity;
 }
 
 /* Larger particles with more visibility */
@@ -512,6 +478,12 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .particles-container {
+    display: none;
+  }
+}
+
 /* Safari-specific hover and transition optimization */
 @supports (-webkit-appearance: none) {
   .group {
@@ -532,14 +504,6 @@ body {
   .transition-transform {
     -webkit-transition-timing-function: ease;
     transition-timing-function: ease;
-  }
-
-  /* Fix Safari's hover state flickering */
-  button:hover,
-  a:hover,
-  .group:hover {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
   }
 
   /* Prevent Safari layout shifts during hover */
@@ -564,4 +528,51 @@ body {
     background: hsl(var(--sidebar-background) / 0.95) !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   }
+}
+
+/* GPU acceleration and performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpu-accelerated {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .blur-\[100px\],
+  .blur-\[120px\] {
+    filter: blur(20px) !important;
+    -webkit-filter: blur(20px) !important;
+  }
+}
+
+.video-poster {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1s ease-in-out infinite;
 }

@@ -557,7 +557,7 @@ export default function PortfolioPage() {
                   {groupUploadsBySubCategory().map((group, groupIndex) => (
                     <div key={group.categoryName} className="space-y-6">
                       <h3 className="text-2xl font-semibold text-foreground border-b pb-3">{group.categoryName}</h3>
-                      <div className="columns-1 gap-6 md:columns-2 lg:columns-3 xl:columns-4">
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {group.items.map((item, index) => {
                           const itemIndex = groupIndex * 100 + index
                           return (
@@ -566,7 +566,7 @@ export default function PortfolioPage() {
                               ref={(el) => {
                                 itemRefs.current[itemIndex] = el
                               }}
-                              className="group relative mb-6 break-inside-avoid overflow-hidden rounded-xl cursor-pointer border border-transparent hover:border-primary/20"
+                              className="group relative overflow-hidden rounded-xl cursor-pointer border border-transparent hover:border-primary/20"
                               style={{
                                 opacity: visibleItems.has(itemIndex) ? 1 : 0,
                                 transform: visibleItems.has(itemIndex) ? "translate3d(0, 0, 0) scale(1)" : "translate3d(0, 50px, 0) scale(0.95)",

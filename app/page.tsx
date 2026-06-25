@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useCallback } from "react"
+import { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { MainNav } from "@/components/main-nav"
 import { PortfolioSection } from "@/components/portfolio-section"
@@ -9,50 +9,90 @@ import { TestimonialsSection } from "@/components/testimonials-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 import { FloatingCTA } from "@/components/floating-cta"
-import { Preloader } from "@/components/preloader"
 import { NewsletterPopup } from "@/components/newsletter-popup"
 import { ParticlesBackground } from "@/components/particles-background"
 import { ChevronUp, ChevronDown, Play } from "lucide-react"
 import Image from "next/image"
-import { VideoLoader } from "@/components/ui/video-loader"
+
+const HERO_VIDEO_URL = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/files-blob/setMedia1/public/hero_1-TADQYrvFa84VSpTkCVRADhHd2xaKQW.mp4"
 
 export default function HomePage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [scrollY, setScrollY] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [videoLoaded, setVideoLoaded] = useState(false)
   const [videoError, setVideoError] = useState(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
-  const [showVideoLoader, setShowVideoLoader] = useState(true)
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false)
 
   useEffect(() => {
+    const checkDevice = () => {
+      const cores = navigator.hardwareConcurrency || 4
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent)
+      setIsLowEndDevice(cores <= 4 || memory <= 4 || isMobile)
+    }
+    checkDevice()
+  }, [])
+
+  const preloadVideo = useCallback(() => {
+    const link = document.createElement("link")
+    link.rel = "preload"
+    link.as = "video"
+    link.type = 'video/mp4; codecs="avc1.42E01E"'
+    link.href = HERO_VIDEO_URL
+    link.crossOrigin = "anonymous"
+    document.head.appendChild(link)
+  }, [])
+
+  useEffect(() => {
+    preloadVideo()
+
+    let ticking = false
+    let lastVisible = false
+
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 500)
-      setScrollY(window.scrollY)
+      if (ticking) return
+
+      ticking = true
+      window.requestAnimationFrame(() => {
+        const nextVisible = window.scrollY > 500
+        if (nextVisible !== lastVisible) {
+          lastVisible = nextVisible
+          setShowScrollTop(nextVisible)
+        }
+        ticking = false
+      })
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [preloadVideo])
 
   const attemptVideoPlay = useCallback(async () => {
     const video = videoRef.current
     if (!video) return
 
+    if (video.readyState < 2) {
+      video.load()
+      return
+    }
+
     try {
-      // Ensure video is muted (required for autoplay on mobile)
       video.muted = true
       video.playsInline = true
+      video.defaultMuted = true
 
-      // Try to play the video
       await video.play()
       setIsVideoPlaying(true)
       setVideoError(false)
-    } catch (error) {
-      console.warn("[v0] Video autoplay failed, will show fallback:", error)
-      setVideoError(true)
-      setIsVideoPlaying(false)
+    } catch (error: unknown) {
+      const err = error as DOMException
+      if (err.name === "NotAllowedError" || err.name === "NotSupportedError") {
+        console.warn("[v0] Video autoplay blocked, waiting for user interaction:", err.message)
+      } else {
+        console.warn("[v0] Video autoplay failed:", err)
+        setVideoError(true)
+        setIsVideoPlaying(false)
+      }
     }
   }, [])
 
@@ -60,75 +100,107 @@ export default function HomePage() {
     const video = videoRef.current
     if (!video) return
 
-    const handleCanPlay = () => {
-      setVideoLoaded(true)
-      // Hide loader after video is ready
-      setTimeout(() => setShowVideoLoader(false), 300)
-      attemptVideoPlay()
+    video.setAttribute("x-webkit-airplay", "deny")
+    video.disablePictureInPicture = true
+    video.disableRemotePlayback = true
+
+    let canPlayThroughFired = false
+    let hasAttemptedPlay = false
+
+    const attemptPlay = async () => {
+      if (hasAttemptedPlay) return
+      hasAttemptedPlay = true
+
+      if (video.readyState >= 2) {
+        try {
+          video.muted = true
+          video.defaultMuted = true
+          video.playsInline = true
+          await video.play()
+          setIsVideoPlaying(true)
+          setVideoError(false)
+        } catch (error: unknown) {
+          const err = error as DOMException
+          if (err.name === "NotAllowedError" || err.name === "NotSupportedError") {
+            console.warn("[v0] Video autoplay blocked, waiting for user interaction:", err.message)
+          } else {
+            console.warn("[v0] Video autoplay failed:", err)
+            setVideoError(true)
+            setIsVideoPlaying(false)
+          }
+        }
+      }
     }
 
-    const handleLoadedData = () => {
-      setVideoLoaded(true)
-      attemptVideoPlay()
+    const handleCanPlayThrough = () => {
+      if (!canPlayThroughFired) {
+        canPlayThroughFired = true
+        attemptPlay()
+      }
     }
 
     const handlePlay = () => {
       setIsVideoPlaying(true)
       setVideoError(false)
-      setShowVideoLoader(false)
     }
 
     const handleError = () => {
       console.error("[v0] Video failed to load")
       setVideoError(true)
-      setVideoLoaded(true)
       setIsVideoPlaying(false)
-      setShowVideoLoader(false)
     }
 
     const handleStalled = () => {
-      // Video stalled, try to resume
-      setTimeout(() => attemptVideoPlay(), 1000)
-    }
-
-    // Add event listeners
-    video.addEventListener("canplay", handleCanPlay)
-    video.addEventListener("loadeddata", handleLoadedData)
-    video.addEventListener("play", handlePlay)
-    video.addEventListener("error", handleError)
-    video.addEventListener("stalled", handleStalled)
-
-    video.load()
-
-    // Also attempt play after a short delay (helps with mobile)
-    const playTimeout = setTimeout(() => {
-      attemptVideoPlay()
-    }, 500)
-
-    // Hide loader after 3 seconds max (failsafe)
-    const loaderTimeout = setTimeout(() => {
-      setShowVideoLoader(false)
-    }, 3000)
-
-    const handleUserInteraction = () => {
-      if (!isVideoPlaying && video.paused) {
-        attemptVideoPlay()
+      if (video.readyState >= 3) {
+        setTimeout(attemptPlay, 500)
       }
     }
 
-    document.addEventListener("touchstart", handleUserInteraction, { once: true })
-    document.addEventListener("click", handleUserInteraction, { once: true })
+    const handleWaiting = () => {
+      if (isVideoPlaying) {
+        setVideoError(true)
+        setIsVideoPlaying(false)
+      }
+    }
+
+    const handleLoadedData = () => {
+      if (!hasAttemptedPlay && video.readyState >= 2) {
+        attemptPlay()
+      }
+    }
+
+    video.addEventListener("canplaythrough", handleCanPlayThrough, { once: true })
+    video.addEventListener("loadeddata", handleLoadedData, { once: true })
+    video.addEventListener("play", handlePlay)
+    video.addEventListener("error", handleError)
+    video.addEventListener("stalled", handleStalled)
+    video.addEventListener("waiting", handleWaiting)
+
+    const playTimeout = setTimeout(() => {
+      if (video.readyState >= 2) {
+        attemptPlay()
+      }
+    }, 1000)
+
+    const handleUserInteraction = () => {
+      if (!isVideoPlaying && video.paused && video.readyState >= 2) {
+        attemptPlay()
+      }
+    }
+
+    document.addEventListener("touchstart", handleUserInteraction, { once: true, passive: true })
+    document.addEventListener("click", handleUserInteraction, { once: true, passive: true })
 
     return () => {
-      video.removeEventListener("canplay", handleCanPlay)
+      video.removeEventListener("canplaythrough", handleCanPlayThrough)
       video.removeEventListener("loadeddata", handleLoadedData)
       video.removeEventListener("play", handlePlay)
       video.removeEventListener("error", handleError)
       video.removeEventListener("stalled", handleStalled)
+      video.removeEventListener("waiting", handleWaiting)
       document.removeEventListener("touchstart", handleUserInteraction)
       document.removeEventListener("click", handleUserInteraction)
       clearTimeout(playTimeout)
-      clearTimeout(loaderTimeout)
     }
   }, [attemptVideoPlay, isVideoPlaying])
 
@@ -142,19 +214,21 @@ export default function HomePage() {
 
   return (
     <>
-      <Preloader onComplete={() => setIsLoading(false)} />
       <NewsletterPopup />
 
-      <div
-        className={`min-h-screen bg-background transition-opacity duration-500 ${isLoading ? "opacity-0" : "opacity-100"}`}
-      >
-        <ParticlesBackground />
+      <div className="min-h-screen bg-background">
+        {!isLowEndDevice && <ParticlesBackground />}
 
         <MainNav />
 
         <section className="relative h-screen w-full overflow-hidden">
-          {/* Video Loading Animation */}
-          <VideoLoader isLoading={showVideoLoader} />
+          <div
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 will-change-opacity ${
+              isVideoPlaying && !videoError ? "opacity-0" : "opacity-100"
+            }`}
+            aria-hidden="true"
+            style={{ backgroundImage: 'url("/hero-poster.webp")', backgroundSize: "cover", backgroundPosition: "center" }}
+          />
 
           <video
             ref={videoRef}
@@ -163,35 +237,33 @@ export default function HomePage() {
             muted
             playsInline
             preload="auto"
-            poster="/cinematic-photography-studio-behind-the-scenes.jpg"
-            style={{
-              transform: `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0001})`,
-            }}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+            crossOrigin="anonymous"
+            poster="/hero-poster.webp"
+            defaultMuted
+            disablePictureInPicture
+            disableRemotePlayback
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 will-change-opacity gpu-accelerated ${
               isVideoPlaying && !videoError ? "opacity-100" : "opacity-0"
             }`}
           >
-            <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/files-blob/setMedia1/public/hero_1-9CetslK4HgmM70OBxkvOaWTWij2S0R.webm" type="video/webm" />
-            <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/files-blob/setMedia1/public/hero_1-TADQYrvFa84VSpTkCVRADhHd2xaKQW.mp4" type="video/mp4" />
+            <source src={HERO_VIDEO_URL} type='video/mp4; codecs="avc1.42E01E"' />
           </video>
 
-          <Image
-            src="/cinematic-photography-studio-behind-the-scenes.jpg"
-            alt="Set Media Studio"
-            fill
-            priority
-            className={`absolute inset-0 object-cover transition-opacity duration-1000 ${
-              !isVideoPlaying || videoError ? "opacity-100" : "opacity-0"
+          <div
+            className={`absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90 transition-opacity duration-700 ${
+              isVideoPlaying && !videoError ? "opacity-0" : "opacity-100"
             }`}
-            style={{
-              transform: `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0001})`,
-            }}
+            aria-hidden="true"
           />
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90" />
 
-          <div className="absolute top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-          <div className="absolute bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse delay-1000" />
+          {!isLowEndDevice && (
+            <>
+              <div className="absolute top-20 left-5 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+              <div className="absolute bottom-20 right-5 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse delay-1000" />
+            </>
+          )}
 
           <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 sm:px-6 text-center">
             <div className="mb-4 sm:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -241,19 +313,27 @@ export default function HomePage() {
 
         <div className="section-divider" />
 
-        <PortfolioSection />
+        <section style={{ contentVisibility: "auto", containIntrinsicSize: "0 800px" }}>
+          <PortfolioSection />
+        </section>
 
         <div className="section-divider" />
 
-        <BookingSection />
+        <section style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+          <BookingSection />
+        </section>
 
         <div className="section-divider" />
 
-        <TestimonialsSection />
+        <section style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+          <TestimonialsSection />
+        </section>
 
         <div className="section-divider" />
 
-        <ContactSection />
+        <section style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
+          <ContactSection />
+        </section>
 
         <Footer />
 
