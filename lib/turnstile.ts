@@ -8,7 +8,7 @@ export interface TurnstileResponse {
 }
 
 export async function verifyTurnstileToken(token: string): Promise<TurnstileResponse> {
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development" || process.env.SKIP_TURNSTILE === "true") {
     return { success: true }
   }
 
@@ -43,6 +43,9 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileResp
 }
 
 export function getTurnstileSiteKey(): string {
+  if (process.env.SKIP_TURNSTILE === "true") {
+    return ""
+  }
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
   if (!siteKey) {
     console.warn("[v0] Turnstile site key not configured")
