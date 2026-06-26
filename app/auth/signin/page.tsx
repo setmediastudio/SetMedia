@@ -81,7 +81,7 @@ export default function SignInPage() {
       })
 
       if (result?.error) {
-        setError("Invalid email or password. Please try again.")
+        setError(result.error)
         setTurnstileToken(null)
       } else {
         const session = await getSession()

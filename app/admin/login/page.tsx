@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
       })
 
       if (result?.error) {
-        setError("Invalid admin credentials")
+        setError(result.error)
         setTurnstileToken(null)
       } else {
         toast({

@@ -8,6 +8,10 @@ export interface TurnstileResponse {
 }
 
 export async function verifyTurnstileToken(token: string): Promise<TurnstileResponse> {
+  if (process.env.NODE_ENV === "development") {
+    return { success: true }
+  }
+
   const secretKey = process.env.TURNSTILE_SECRET_KEY
 
   if (!secretKey) {
