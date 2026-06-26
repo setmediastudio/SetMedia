@@ -11,9 +11,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    proxyClientMaxBodySize: "100mb",
-  },
+
   webpack: (config) => {
     config.resolve.alias["@"] = path.resolve(__dirname)
     return config
